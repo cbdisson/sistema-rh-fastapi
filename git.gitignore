@@ -1,0 +1,5 @@
+venv/
+__pycache__/
+*.pyc
+.env
+funcionarios.db  # Remova essa linha se quiser subir o banco de dados
