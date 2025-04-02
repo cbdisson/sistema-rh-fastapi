@@ -1,10 +1,16 @@
-# Sistema de RH com FastAPI
+# Sistema de Registro Completo
 
-Um sistema básico para gestão de funcionários com:
-- Autenticação JWT
-- CRUD completo
-- Banco de dados SQLite
+Sistema completo de registro com PostgreSQL, FastAPI e operações CRUD.
 
-## Como executar
-```bash
-uvicorn main:app --reload
+## Pré-requisitos
+
+- Python 3.7+
+- PostgreSQL
+- pip
+
+## Instalação
+
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/seu-projeto.git
+   cd seu-projeto

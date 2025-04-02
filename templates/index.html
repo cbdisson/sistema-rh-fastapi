@@ -3,56 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de RH</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Login - Sistema RH</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Sistema de Gestão de Funcionários</h1>
-            <div id="auth-section">
-                <div id="login-form">
-                    <h2>Login RH</h2>
-                    <input type="email" id="login-email" placeholder="Email">
-                    <input type="password" id="login-senha" placeholder="Senha">
-                    <button onclick="login()">Entrar</button>
-                </div>
-                <div id="user-info" style="display: none;">
-                    <span id="user-name"></span>
-                    <button onclick="logout()">Sair</button>
-                </div>
+        <h2>Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
             </div>
-        </header>
-
-        <main>
-            <div id="funcionarios-section" style="display: none;">
-                <h2>Gerenciar Funcionários</h2>
-                
-                <div class="form-container">
-                    <h3>Adicionar Novo Funcionário</h3>
-                    <form id="form-funcionario">
-                        <input type="text" id="cpf" placeholder="CPF (111.222.333-44)" required>
-                        <input type="text" id="nome" placeholder="Nome Completo" required>
-                        <input type="date" id="data-nascimento">
-                        <input type="text" id="cargo" placeholder="Cargo" required>
-                        <input type="number" id="salario" placeholder="Salário" step="0.01" required>
-                        <input type="text" id="departamento" placeholder="Departamento" required>
-                        <button type="submit">Salvar</button>
-                    </form>
-                </div>
-
-                <div class="filter-container">
-                    <input type="text" id="filter-departamento" placeholder="Filtrar por departamento">
-                    <button onclick="listarFuncionarios()">Filtrar</button>
-                </div>
-
-                <div id="funcionarios-list">
-                    <!-- Lista de funcionários será carregada aqui -->
-                </div>
+            <div class="form-group">
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" required>
             </div>
-        </main>
+            <button type="submit">Entrar</button>
+            <div id="error-message"></div>
+        </form>
     </div>
-
-    <script src="script.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 </html>

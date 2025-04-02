@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Funcionário - Sistema RH</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/registro.css">
+</head>
+<body>
+    <div class="container registro-container">
+        <div class="form-title">
+            <h2>REGISTRO DE EMPREGADO</h2>
+            <div class="registry-info">
+                <label>Nº Registro no Livro:</label>
+                <input type="text" id="registro_livro">
+                <label>Folha:</label>
+                <input type="text" id="folha">
+            </div>
+        </div>
+
+        <form id="cadastroForm">
+            <!-- DADOS DO EMPREGADOR -->
+            <div class="form-section full-width">
+                <h3>DADOS DO EMPREGADOR</h3>
+                <div class="form-row">
+                    <label>Razão Social / Nome:</label>
+                    <input type="text" id="razao_social" required>
+                    <label style="margin-left: 20px;">CNPJ / CEI:</label>
+                    <input type="text" id="cnpj_cei" required>
+                </div>
+                <div class="form-row">
+                    <label>Endereço (Logradouro, Número, Andar, Apartamento):</label>
+                    <input type="text" id="endereco_empregador" required>
+                </div>
+                <div class="form-row">
+                    <label>Bairro (Distrito):</label>
+                    <input type="text" id="bairro_empregador" required>
+                    <label style="margin-left: 20px;">Município - UF:</label>
+                    <input type="text" id="municipio_empregador" style="width: 150px;">
+                    <input type="text" id="uf_empregador" maxlength="2" style="width: 50px;">
+                    <label style="margin-left: 20px;">CEP:</label>
+                    <input type="text" id="cep_empregador">
+                </div>
+            </div>
+
+            <!-- DADOS DO EMPREGADO -->
+            <div class="form-section full-width">
+                <h3>DADOS DO EMPREGADO</h3>
+                <div class="form-row">
+                    <label>Nome:</label>
+                    <input type="text" id="nome" required>
+                    <label style="margin-left: 20px;">Data Nascimento:</label>
+                    <input type="date" id="data_nascimento" required>
+                    <label style="margin-left: 20px;">Município de Nascimento - UF:</label>
+                    <input type="text" id="municipio_nascimento">
+                    <input type="text" id="uf_nascimento" maxlength="2" style="width: 50px;">
+                </div>
+                <div class="form-row">
+                    <label>Endereço (Logradouro, Número e Complemento):</label>
+                    <input type="text" id="endereco_empregado" required>
+                </div>
+                <div class="form-row">
+                    <label>Bairro / Município - UF:</label>
+                    <input type="text" id="bairro_empregado">
+                    <label style="margin-left: 20px;">CEP:</label>
+                    <input type="text" id="cep_empregado">
+                </div>
+            </div>
+
+            <!-- BENEFICIÁRIOS -->
+            <div class="form-section full-width">
+                <h3>BENEFICIÁRIOS: Nome - Data Nascimento - Parentesco</h3>
+                <div class="form-row">
+                    <input type="text" style="flex: 1;">
+                </div>
+                <div class="form-row">
+                    <input type="text" style="flex: 1;">
+                </div>
+                <div class="form-row">
+                    <input type="text" style="flex: 1;">
+                </div>
+                <div class="form-row">
+                    <input type="text" style="flex: 1;">
+                </div>
+                <div class="form-row">
+                    <input type="text" style="flex: 1;">
+                </div>
+            </div>
+
+            <!-- DADOS FAMILIARES -->
+            <div class="form-section full-width">
+                <div class="form-row">
+                    <label>Nome da Mãe:</label>
+                    <input type="text" id="nome_mae" required>
+                    <label style="margin-left: 20px;">Nome do Pai:</label>
+                    <input type="text" id="nome_pai" required>
+                </div>
+            </div>
+
+            <!-- DOCUMENTOS -->
+            <div class="form-section full-width">
+                <div class="form-row">
+                    <label>Nacionalidade:</label>
+                    <input type="text" id="nacionalidade" required>
+                    <label style="margin-left: 20px;">Estado Civil:</label>
+                    <input type="text" id="estado_civil" required>
+                    <label style="margin-left: 20px;">RG Número:</label>
+                    <input type="text" id="rg_numero" required>
+                    <label style="margin-left: 20px;">Data Emissão:</label>
+                    <input type="date" id="rg_data_emissao" required>
+                    <label style="margin-left: 20px;">Órgão:</label>
+                    <input type="text" id="rg_orgao_emissor" required>
+                </div>
+                <div class="form-row">
+                    <label>CPF Número:</label>
+                    <input type="text" id="cpf" required>
+                    <label style="margin-left: 20px;">CTPS / Série / UF:</label>
+                    <input type="text" id="ctps_numero" style="width: 80px;">
+                    <input type="text" id="ctps_serie" style="width: 80px;">
+                    <input type="text" id="ctps_uf" maxlength="2" style="width: 50px;">
+                    <label style="margin-left: 20px;">Data Emissão:</label>
+                    <input type="date" id="ctps_data_emissao">
+                </div>
+                <div class="form-row">
+                    <label>Título de Eleitor:</label>
+                    <input type="text" id="titulo_eleitor">
+                    <label style="margin-left: 20px;">Zona / Seção:</label>
+                    <input type="text" id="zona_eleitoral" style="width: 80px;">
+                    <input type="text" id="secao_eleitoral" style="width: 80px;">
+                </div>
+                <div class="form-row">
+                    <label>Habilitação:</label>
+                    <input type="text" id="habilitacao">
+                    <label style="margin-left: 20px;">Categoria:</label>
+                    <input type="text" id="categoria_habilitacao">
+                    <label style="margin-left: 20px;">Documento Militar:</label>
+                    <input type="text" id="documento_militar">
+                    <label style="margin-left: 20px;">CBO Número:</label>
+                    <input type="text" id="cbo_numero">
+                </div>
+            </div>
+
+            <!-- DADOS PROFISSIONAIS -->
+            <div class="form-section full-width">
+                <div class="form-row">
+                    <label>Cargo / Função:</label>
+                    <input type="text" id="cargo" required>
+                    <label style="margin-left: 20px;">Data Admissão:</label>
+                    <input type="date" id="data_admissao" required>
+                    <label style="margin-left: 20px;">Salário:</label>
+                    <input type="number" id="salario" step="0.01" required>
+                    <label style="margin-left: 20px;">Tipo de Pagamento:</label>
+                    <input type="text" id="tipo_pagamento" required>
+                    <label style="margin-left: 20px;">Horas Mês:</label>
+                    <input type="number" id="horas_mensais" required>
+                </div>
+                <div class="form-row">
+                    <label>Departamento:</label>
+                    <input type="text" id="departamento" required>
+                    <label style="margin-left: 20px;">Grau de Instrução:</label>
+                    <input type="text" id="grau_instrucao" required>
+                    <label style="margin-left: 20px;">Adicional Periculosidade:</label>
+                    <input type="text" id="adicional_periculosidade" value="0,00%">
+                    <label style="margin-left: 20px;">Adicional Insalubridade:</label>
+                    <input type="text" id="adicional_insalubridade" value="0,00%">
+                    <label style="margin-left: 20px;">Telefone Residencial:</label>
+                    <input type="text" id="telefone">
+                </div>
+            </div>
+
+            <!-- FGTS -->
+            <div class="form-section full-width">
+                <h3>FUNDO DE GARANTIA POR TEMPO DE SERVIÇO - FGTS</h3>
+                <div class="form-row">
+                    <label>Data da Opção:</label>
+                    <input type="date" id="fgts_data_opcao" required>
+                    <label style="margin-left: 20px;">Banco Depositário:</label>
+                    <input type="text" id="banco_depositario" value="Caixa Econômica Federal" readonly>
+                </div>
+            </div>
+
+            <!-- HORÁRIO DE TRABALHO -->
+            <div class="form-section full-width">
+                <h3>HORÁRIO DE TRABALHO</h3>
+                <div class="form-row">
+                    <label>Seg =</label>
+                    <input type="text" id="horario_seg" value="07:30 12:00 13:00 17:30">
+                    <label style="margin-left: 20px;">Sex =</label>
+                    <input type="text" id="horario_sex" value="07:30 12:00 13:00 16:30">
+                </div>
+                <div class="form-row">
+                    <label>Ter =</label>
+                    <input type="text" id="horario_ter" value="07:30 12:00 13:00 17:30">
+                    <label style="margin-left: 20px;">Sáb =</label>
+                    <input type="text" id="horario_sab" value="Descanso Semanal Remunerado">
+                </div>
+                <div class="form-row">
+                    <label>Qua =</label>
+                    <input type="text" id="horario_qua" value="07:30 12:00 13:00 17:30">
+                    <label style="margin-left: 20px;">Dom =</label>
+                    <input type="text" id="horario_dom" value="Descanso Semanal Remunerado">
+                </div>
+                <div class="form-row">
+                    <label>Qui =</label>
+                    <input type="text" id="horario_qui" value="07:30 12:00 13:00 17:30">
+                </div>
+            </div>
+
+            <!-- PIS -->
+            <div class="form-section full-width">
+                <h3>PROGRAMA DE INTEGRAÇÃO SOCIAL - PIS</h3>
+                <div class="form-row">
+                    <label>PIS Número:</label>
+                    <input type="text" id="pis" required>
+                    <label style="margin-left: 20px;">Cadastrado em:</label>
+                    <input type="date" id="pis_data_cadastro" required>
+                    <label style="margin-left: 20px;">Nome do Banco:</label>
+                    <input type="text" id="nome_banco" value="CAIXA ECONÔMICA FEDERAL" readonly>
+                </div>
+                <div class="form-row">
+                    <label>Endereço do Banco:</label>
+                    <input type="text" id="endereco_banco">
+                    <label style="margin-left: 20px;">Número do Banco:</label>
+                    <input type="text" id="numero_banco" value="104" readonly>
+                    <label style="margin-left: 20px;">Agência:</label>
+                    <input type="text" id="agencia_banco">
+                </div>
+            </div>
+
+            <!-- ESTRANGEIRO E RESCISÃO -->
+            <div class="form-section full-width">
+                <div class="form-row">
+                    <label>Registro Estrangeiro (RNE):</label>
+                    <input type="text" id="rne">
+                    <label style="margin-left: 20px;">Casado com Brasileiro?</label>
+                    <input type="text" id="casado_brasileiro">
+                    <label style="margin-left: 20px;">Data da Saída:</label>
+                    <input type="date" id="data_saida">
+                    <label style="margin-left: 20px;">Homologação Número:</label>
+                    <input type="text" id="homologacao_numero">
+                </div>
+                <div class="form-row">
+                    <label>Nome do Cônjuge:</label>
+                    <input type="text" id="nome_conjuge">
+                    <label style="margin-left: 20px;">Tipo de Desligamento:</label>
+                    <input type="text" id="tipo_desligamento">
+                </div>
+                <div class="form-row">
+                    <label>Data Chegada ao Brasil:</label>
+                    <input type="date" id="data_chegada_brasil">
+                    <label style="margin-left: 20px;">Número de Filhos Brasileiros:</label>
+                    <input type="number" id="filhos_brasileiros">
+                    <label style="margin-left: 20px;">Local da Homologação:</label>
+                    <input type="text" id="local_homologacao">
+                </div>
+                <div class="form-row">
+                    <label>Naturalizado:</label>
+                    <input type="text" id="naturalizado">
+                    <label style="margin-left: 20px;">Decreto Número:</label>
+                    <input type="text" id="decreto_numero">
+                    <label style="margin-left: 20px;">Carimbo e assinatura do empregador:</label>
+                    <input type="text" id="carimbo_empregador">
+                    <label style="margin-left: 20px;">Data:</label>
+                    <input type="date" id="data_carimbo">
+                </div>
+                <div class="form-row">
+                    <label>Visto:</label>
+                    <input type="text" id="visto">
+                    <label style="margin-left: 20px;">Vencimento:</label>
+                    <input type="date" id="vencimento_visto">
+                </div>
+            </div>
+
+            <!-- ASSINATURAS -->
+            <div class="form-section full-width">
+                <div class="form-row">
+                    <label>Assinatura do empregado na admissão:</label>
+                    <input type="text" id="assinatura_admissao">
+                    <label style="margin-left: 20px;">Data:</label>
+                    <input type="date" id="data_assinatura_admissao">
+                    <label style="margin-left: 20px;">Assinatura do empregado na rescisão:</label>
+                    <input type="text" id="assinatura_rescisao">
+                    <label style="margin-left: 20px;">Data:</label>
+                    <input type="date" id="data_assinatura_rescisao">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn-voltar" onclick="location.href='../dashboard.html'">Voltar ao Menu</button>
+                <button type="submit" class="btn-success">Cadastrar Funcionário</button>
+            </div>
+        </form>
+    </div>
+    <script src="../js/auth.js"></script>
+    <script src="../js/funcionarios.js"></script>
+</body>
+</html>

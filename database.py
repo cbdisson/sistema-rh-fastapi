@@ -1,46 +1,49 @@
-import sqlite3
-import logging
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import sessionmaker, declarative_base
+from dotenv import load_dotenv
+import os
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Carregar variáveis de ambiente do .env
+load_dotenv()
 
+# Criar URL do banco de dados com valores padrão para evitar erros
+DATABASE_URL = f"postgresql://{os.getenv('POSTGRES_USER', 'user')}:{os.getenv('POSTGRES_PASSWORD', 'password')}" \
+               f"@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'database')}"
+
+# Criar o motor do SQLAlchemy (com echo=True para depuração)
+engine = create_engine(DATABASE_URL, echo=True)
+
+# Criar sessão do banco de dados
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Criar base declarativa
+Base = declarative_base()
+
+# Função para obter a sessão do banco de dados
 def get_db():
-    conn = sqlite3.connect('funcionarios.db')
-    conn.row_factory = sqlite3.Row  # Retorna linhas como dicionários
-    return conn
-
-def criar_tabelas():
-    conn = get_db()
+    db = SessionLocal()
     try:
-        # Tabela de Funcionários
-        conn.execute('''
-        CREATE TABLE IF NOT EXISTS funcionarios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cpf TEXT UNIQUE NOT NULL,
-            nome TEXT NOT NULL,
-            data_nascimento TEXT,
-            cargo TEXT,
-            salario REAL,
-            departamento TEXT,
-            criado_em TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-        ''')
-
-        # Tabela de Usuários do RH
-        conn.execute('''
-        CREATE TABLE IF NOT EXISTS usuarios_rh (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT UNIQUE NOT NULL,
-            nome TEXT NOT NULL,
-            senha_hash TEXT NOT NULL,
-            nivel_acesso TEXT NOT NULL,
-            criado_em TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-        ''')
-        conn.commit()
-        logger.info("Tabelas criadas com sucesso!")
+        yield db
     except Exception as e:
-        logger.error(f"Erro ao criar tabelas: {e}")
-        raise
+        print(f"Erro na sessão do banco de dados: {e}")
+        db.rollback()
     finally:
-        conn.close()
+        db.close()
+
+# Criar tabelas no banco de dados
+def criar_tabelas():
+    try:
+        Base.metadata.create_all(bind=engine)
+        print("✅ Tabelas criadas com sucesso!")
+    except Exception as e:
+        print(f"❌ Erro ao criar tabelas: {e}")
+
+# Modelo de Usuário RH
+class UsuarioRH(Base):
+    __tablename__ = "usuarios_rh"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(100), unique=True, index=True, nullable=False)
+    nome = Column(String(100), nullable=False)
+    senha_hash = Column(String(255), nullable=False)
+    nivel_acesso = Column(String(20), default="user", nullable=False)

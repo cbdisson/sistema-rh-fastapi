@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Funcionários - Sistema RH</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Lista de Funcionários</h2>
+        
+        <div class="form-group">
+            <label for="departamentoFilter">Filtrar por Departamento:</label>
+            <select id="departamentoFilter">
+                <option value="">Todos</option>
+                <option value="TI">TI</option>
+                <option value="RH">RH</option>
+                <option value="Financeiro">Financeiro</option>
+                <option value="Vendas">Vendas</option>
+            </select>
+            <button onclick="filtrarFuncionarios()">Filtrar</button>
+        </div>
+
+        <table id="funcionariosTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Departamento</th>
+                    <th>Cargo</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <div class="acoes">
+            <button class="btn-voltar" onclick="location.href='../dashboard.html'">Voltar ao Menu</button>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/funcionarios.js"></script>
+</body>
+</html>

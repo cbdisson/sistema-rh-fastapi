@@ -1,203 +1,131 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List, Optional
-from auth import get_usuario_atual
-from models import FuncionarioCreate, FuncionarioResponse, FuncionarioUpdate
+from sqlalchemy.orm import Session
+from models import FuncionarioCreate, FuncionarioResponse, FuncionarioUpdate, FuncionarioDB
 from database import get_db
-import sqlite3
-import logging
+from auth import get_usuario_atual
+from database import UsuarioRH
 
 router = APIRouter()
-logger = logging.getLogger(__name__)
 
 @router.get("/funcionarios", response_model=List[FuncionarioResponse])
 def listar_funcionarios(
-    usuario_atual: dict = Depends(get_usuario_atual),
-    departamento: Optional[str] = None
+    db: Session = Depends(get_db),
+    departamento: Optional[str] = None,
+    ativo: Optional[bool] = True,
+    current_user: UsuarioRH = Depends(get_usuario_atual)
 ):
-    """Lista todos os funcionários, com filtro opcional por departamento"""
-    conn = None
-    try:
-        conn = get_db()
-        cursor = conn.cursor()
-        
-        if departamento:
-            cursor.execute("SELECT * FROM funcionarios WHERE departamento = ?", (departamento,))
-        else:
-            cursor.execute("SELECT * FROM funcionarios")
-            
-        return [dict(row) for row in cursor.fetchall()]
-    except Exception as e:
-        logger.error(f"Erro ao listar funcionários: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erro ao recuperar funcionários"
-        )
-    finally:
-        if conn:
-            conn.close()
+    """Lista todos os funcionários com filtros opcionais"""
+    query = db.query(FuncionarioDB)
+    
+    if departamento:
+        query = query.filter(FuncionarioDB.departamento == departamento)
+    if ativo is not None:
+        query = query.filter(FuncionarioDB.ativo == ativo)
+
+    return query.all()
 
 @router.get("/funcionarios/{id}", response_model=FuncionarioResponse)
 def buscar_funcionario(
-    id: int, 
-    usuario_atual: dict = Depends(get_usuario_atual)
+    id: int,
+    db: Session = Depends(get_db),
+    current_user: UsuarioRH = Depends(get_usuario_atual)
 ):
-    """Busca um funcionário específico pelo ID"""
-    conn = None
-    try:
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM funcionarios WHERE id = ?", (id,))
-        funcionario = cursor.fetchone()
-        
-        if not funcionario:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Funcionário não encontrado"
-            )
-            
-        return dict(funcionario)
-    except Exception as e:
-        logger.error(f"Erro ao buscar funcionário: {e}")
+    """Busca um funcionário pelo ID"""
+    funcionario = db.query(FuncionarioDB).filter(FuncionarioDB.id == id).first()
+    if not funcionario:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erro ao buscar funcionário"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Funcionário não encontrado"
         )
-    finally:
-        if conn:
-            conn.close()
+    return funcionario
 
 @router.post("/funcionarios", response_model=FuncionarioResponse, status_code=status.HTTP_201_CREATED)
 def criar_funcionario(
     funcionario: FuncionarioCreate,
-    usuario_atual: dict = Depends(get_usuario_atual)
+    db: Session = Depends(get_db),
+    current_user: UsuarioRH = Depends(get_usuario_atual)
 ):
     """Cria um novo funcionário"""
-    conn = None
     try:
-        conn = get_db()
-        cursor = conn.cursor()
-        
-        cursor.execute(
-            """INSERT INTO funcionarios 
-            (cpf, nome, data_nascimento, cargo, salario, departamento) 
-            VALUES (?, ?, ?, ?, ?, ?)""",
-            (
-                funcionario.cpf,
-                funcionario.nome,
-                funcionario.data_nascimento.isoformat() if funcionario.data_nascimento else None,
-                funcionario.cargo,
-                funcionario.salario,
-                funcionario.departamento
-            )
-        )
-        conn.commit()
-        
-        cursor.execute("SELECT * FROM funcionarios WHERE id = last_insert_rowid()")
-        return dict(cursor.fetchone())
-        
-    except sqlite3.IntegrityError as e:
-        logger.error(f"Erro de integridade: {e}")
+        db_funcionario = FuncionarioDB(**funcionario.dict())
+        db.add(db_funcionario)
+        db.commit()
+        db.refresh(db_funcionario)
+        return db_funcionario
+    except Exception as e:
+        db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="CPF já cadastrado no sistema"
+            detail=f"Erro ao criar funcionário: {str(e)}"
         )
-    except Exception as e:
-        logger.error(f"Erro inesperado: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erro ao processar o cadastro"
-        )
-    finally:
-        if conn:
-            conn.close()
 
 @router.put("/funcionarios/{id}", response_model=FuncionarioResponse)
 def atualizar_funcionario(
     id: int,
     funcionario: FuncionarioUpdate,
-    usuario_atual: dict = Depends(get_usuario_atual)
+    db: Session = Depends(get_db),
+    current_user: UsuarioRH = Depends(get_usuario_atual)
 ):
     """Atualiza os dados de um funcionário"""
-    conn = None
     try:
-        conn = get_db()
-        cursor = conn.cursor()
-        
-        # Verifica se o funcionário existe
-        cursor.execute("SELECT id FROM funcionarios WHERE id = ?", (id,))
-        if not cursor.fetchone():
+        db_funcionario = db.query(FuncionarioDB).filter(FuncionarioDB.id == id).first()
+        if not db_funcionario:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Funcionário não encontrado"
             )
         
-        # Atualiza os campos fornecidos
-        campos_para_atualizar = []
-        valores = []
+        update_data = funcionario.dict(exclude_unset=True)
         
-        if funcionario.nome:
-            campos_para_atualizar.append("nome = ?")
-            valores.append(funcionario.nome)
-        if funcionario.cargo:
-            campos_para_atualizar.append("cargo = ?")
-            valores.append(funcionario.cargo)
-        if funcionario.salario:
-            campos_para_atualizar.append("salario = ?")
-            valores.append(funcionario.salario)
-        if funcionario.departamento:
-            campos_para_atualizar.append("departamento = ?")
-            valores.append(funcionario.departamento)
+        # Atualiza apenas campos fornecidos
+        for field, value in update_data.items():
+            setattr(db_funcionario, field, value)
         
-        if not campos_para_atualizar:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Nenhum dado fornecido para atualização"
-            )
+        db.add(db_funcionario)
+        db.commit()
+        db.refresh(db_funcionario)
         
-        valores.append(id)
-        query = f"UPDATE funcionarios SET {', '.join(campos_para_atualizar)} WHERE id = ?"
-        cursor.execute(query, valores)
-        conn.commit()
-        
-        cursor.execute("SELECT * FROM funcionarios WHERE id = ?", (id,))
-        return dict(cursor.fetchone())
-        
+        return db_funcionario
     except Exception as e:
-        logger.error(f"Erro ao atualizar funcionário: {e}")
+        db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erro ao atualizar funcionário"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Erro ao atualizar funcionário: {str(e)}"
         )
-    finally:
-        if conn:
-            conn.close()
 
-@router.delete("/funcionarios/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/funcionarios/{id}", status_code=status.HTTP_200_OK)
 def deletar_funcionario(
     id: int,
-    usuario_atual: dict = Depends(get_usuario_atual)
+    db: Session = Depends(get_db),
+    current_user: UsuarioRH = Depends(get_usuario_atual)
 ):
-    """Remove um funcionário do sistema"""
-    conn = None
+    """Desativa um funcionário (deleção lógica)"""
     try:
-        conn = get_db()
-        cursor = conn.cursor()
-        
-        cursor.execute("DELETE FROM funcionarios WHERE id = ?", (id,))
-        if cursor.rowcount == 0:
+        funcionario = db.query(FuncionarioDB).filter(FuncionarioDB.id == id).first()
+        if not funcionario:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Funcionário não encontrado"
             )
-            
-        conn.commit()
-        return None
+        
+        funcionario.ativo = False
+        db.add(funcionario)
+        db.commit()
+        
+        return {"mensagem": "Funcionário desativado com sucesso"}
     except Exception as e:
-        logger.error(f"Erro ao deletar funcionário: {e}")
+        db.rollback()
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erro ao remover funcionário"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Erro ao desativar funcionário: {str(e)}"
         )
-    finally:
-        if conn:
-            conn.close()
+
+@router.get("/departamentos", response_model=List[str])
+def listar_departamentos(
+    db: Session = Depends(get_db),
+    current_user: UsuarioRH = Depends(get_usuario_atual)
+):
+    """Lista todos os departamentos distintos"""
+    departamentos = db.query(FuncionarioDB.departamento).distinct().all()
+    return [d[0] for d in departamentos if d[0]]

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Funcionário - Sistema RH</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/registro.css">
+</head>
+<body>
+    <div class="container registro-container">
+        <div class="form-title">
+            <h2>EDIÇÃO DE EMPREGADO</h2>
+            <div class="registry-info">
+                <label>ID do Funcionário:</label>
+                <input type="text" id="funcionario_id" readonly>
+            </div>
+        </div>
+
+        <form id="editarForm">
+            <!-- DADOS DO EMPREGADO -->
+            <div class="form-section full-width">
+                <h3>DADOS DO EMPREGADO</h3>
+                <div class="form-row">
+                    <label>Nome:</label>
+                    <input type="text" id="nome" required>
+                    <label style="margin-left: 20px;">Data Nascimento:</label>
+                    <input type="date" id="data_nascimento" required>
+                </div>
+                
+                <div class="form-row">
+                    <label>CPF:</label>
+                    <input type="text" id="cpf" required>
+                    <label style="margin-left: 20px;">RG:</label>
+                    <input type="text" id="rg_numero" required>
+                </div>
+                
+                <div class="form-row">
+                    <label>Nome da Mãe:</label>
+                    <input type="text" id="nome_mae" required>
+                    <label style="margin-left: 20px;">Nome do Pai:</label>
+                    <input type="text" id="nome_pai" required>
+                </div>
+            </div>
+
+            <!-- DADOS PROFISSIONAIS -->
+            <div class="form-section full-width">
+                <h3>DADOS PROFISSIONAIS</h3>
+                <div class="form-row">
+                    <label>Cargo:</label>
+                    <input type="text" id="cargo" required>
+                    <label style="margin-left: 20px;">Departamento:</label>
+                    <input type="text" id="departamento" required>
+                </div>
+                
+                <div class="form-row">
+                    <label>Data Admissão:</label>
+                    <input type="date" id="data_admissao" required>
+                    <label style="margin-left: 20px;">Salário:</label>
+                    <input type="number" id="salario" step="0.01" required>
+                </div>
+                
+                <div class="form-row">
+                    <label>Status:</label>
+                    <select id="ativo">
+                        <option value="true">Ativo</option>
+                        <option value="false">Inativo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-voltar" onclick="location.href='../funcionarios/listar.html'">Voltar</button>
+                <button type="submit" class="btn-success">Salvar Alterações</button>
+                <button type="button" class="btn-danger" id="btnDesativar">Desativar Funcionário</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="../js/auth.js"></script>
+    <script src="../js/editarFuncionario.js"></script>
+</body>
+</html>

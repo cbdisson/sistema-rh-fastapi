@@ -1,60 +1,77 @@
-from fastapi import APIRouter, HTTPException, status
-from models import UsuarioRHCreate, UsuarioRHLogin, Token
+from fastapi import APIRouter, HTTPException, status, Depends
+from typing import List
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+
+from database import UsuarioRH, get_db
+from models import UsuarioRHCreate, Token, UsuarioRH as UsuarioRHModel
 from auth import (
     criar_hash_senha,
     verificar_senha,
     criar_access_token,
-    get_usuario_atual
+    get_usuario_admin
 )
-from database import get_db
-import sqlite3
 
 router = APIRouter()
 
 @router.post("/rh/cadastrar", status_code=status.HTTP_201_CREATED)
-def cadastrar_usuario_rh(usuario: UsuarioRHCreate):
-    """Cadastra um novo usuário do RH"""
-    conn = get_db()
+def cadastrar_usuario_rh(
+    usuario: UsuarioRHCreate,
+    db: Session = Depends(get_db)
+):
+    """Cadastro de usuários no RH"""
+    
+    db_usuario = UsuarioRH(
+        email=usuario.email,
+        nome=usuario.nome,
+        senha_hash=criar_hash_senha(usuario.senha),
+        nivel_acesso=usuario.nivel_acesso
+    )
+    db.add(db_usuario)
     try:
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO usuarios_rh (email, nome, senha_hash, nivel_acesso) VALUES (?, ?, ?, ?)",
-            (
-                usuario.email,
-                usuario.nome,
-                criar_hash_senha(usuario.senha),
-                usuario.nivel_acesso
-            )
-        )
-        conn.commit()
+        db.commit()
         return {"mensagem": "Usuário RH cadastrado com sucesso"}
-    except sqlite3.IntegrityError:
+    except IntegrityError:
+        db.rollback()
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email já cadastrado"
         )
-    finally:
-        conn.close()
 
 @router.post("/rh/login", response_model=Token)
-def login_rh(credenciais: UsuarioRHLogin):
-    """Rota de login que retorna um token JWT"""
-    conn = get_db()
-    try:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM usuarios_rh WHERE email = ?", (credenciais.email,))
-        usuario = cursor.fetchone()
-        
-        if not usuario or not verificar_senha(credenciais.senha, usuario["senha_hash"]):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Email ou senha incorretos"
-            )
-        
-        access_token = criar_access_token(
-            data={"sub": usuario["email"], "nivel": usuario["nivel_acesso"]}
+def login_rh(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    """Autenticação de usuário e geração do token JWT"""
+    
+    usuario = db.query(UsuarioRH).filter(UsuarioRH.email == form_data.username).first()
+    
+    if not usuario:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Usuário não encontrado"
         )
-        
-        return {"access_token": access_token, "token_type": "bearer"}
-    finally:
-        conn.close()
+
+    if not verificar_senha(form_data.password, usuario.senha_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Senha incorreta"
+        )
+    
+    access_token = criar_access_token(
+        data={"sub": usuario.email, "nivel": usuario.nivel_acesso}
+    )
+    
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/rh/usuarios", response_model=List[UsuarioRHModel])
+def listar_usuarios_rh(
+    db: Session = Depends(get_db),
+    current_user: UsuarioRH = Depends(get_usuario_admin)
+):
+    """Listagem de usuários RH (apenas para administradores)"""
+    
+    usuarios = db.query(UsuarioRH).all()
+    return usuarios
