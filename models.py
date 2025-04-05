@@ -5,9 +5,6 @@ from sqlalchemy import Column, Integer, String, Date, Numeric, Boolean, TIMESTAM
 from sqlalchemy.orm import relationship
 from database import Base
 
-# ==============================
-# MODELO DO BANCO DE DADOS
-# ==============================
 
 class BeneficiarioDB(Base):
     __tablename__ = "beneficiarios"
@@ -15,7 +12,7 @@ class BeneficiarioDB(Base):
     id = Column(Integer, primary_key=True, index=True)
     funcionario_id = Column(Integer, ForeignKey('funcionarios.id', ondelete="CASCADE"), nullable=False)
     nome = Column(String(100), nullable=False)
-    data_nascimento = Column(Date, nullable=False)
+    data_nascimento = Column(Date, nullable=True)
     parentesco = Column(String(50), nullable=False)
 
     funcionario = relationship("FuncionarioDB", back_populates="beneficiarios")
@@ -75,6 +72,7 @@ class FuncionarioDB(Base):
     criado_em = Column(TIMESTAMP, server_default=func.now())
     ativo = Column(Boolean, default=True)
     observacoes = Column(Text, nullable=True)
+    tipo_desligamento = Column(String(50), nullable=True)
 
     beneficiarios = relationship("BeneficiarioDB", back_populates="funcionario", cascade="all, delete")
 
@@ -84,8 +82,8 @@ class FuncionarioDB(Base):
 
 class BeneficiarioBase(BaseModel):
     nome: str
-    data_nascimento: date
     parentesco: str
+    data_nascimento: Optional[date] = None
 
 class FuncionarioBase(BaseModel):
     cpf: str = Field(..., pattern=r'^\d{3}\.\d{3}\.\d{3}-\d{2}$')
@@ -113,7 +111,7 @@ class FuncionarioBase(BaseModel):
     funcao: str
     departamento: str
     data_admissao: date
-    salario: float = Field(..., gt=0)
+    salario: float = Field(..., ge=0)
     tipo_pagamento: str
     horas_mensais: int = Field(..., gt=0, le=300)
     tipo_contrato: str
@@ -135,6 +133,44 @@ class FuncionarioUpdate(BaseModel):
     funcao: Optional[str] = None
     departamento: Optional[str] = None
     salario: Optional[float] = None
+    data_demissao: Optional[date] = None
+    tipo_desligamento: Optional[str] = None
+    observacoes: Optional[str] = None
+    ativo: Optional[bool] = None
+    cpf: Optional[str] = Field(None, pattern=r'^\d{3}\.\d{3}\.\d{3}-\d{2}$')
+    nome: Optional[str] = Field(None, max_length=100)
+    data_nascimento: Optional[date] = None
+    municipio_nascimento: Optional[str] = None
+    uf_nascimento: Optional[str] = Field(None, max_length=2)
+    nome_mae: Optional[str] = None
+    nome_pai: Optional[str] = None
+    nacionalidade: Optional[str] = None
+    estado_civil: Optional[str] = None
+    rg_numero: Optional[str] = None
+    rg_data_emissao: Optional[date] = None
+    rg_orgao_emissor: Optional[str] = None
+    ctps_numero: Optional[str] = None
+    ctps_serie: Optional[str] = None
+    ctps_uf: Optional[str] = Field(None, max_length=2)
+    ctps_data_emissao: Optional[date] = None
+    titulo_eleitor: Optional[str] = None
+    titulo_zona: Optional[str] = None
+    titulo_secao: Optional[str] = None
+    pis: Optional[str] = None
+    pis_data_cadastro: Optional[date] = None
+    cargo: Optional[str] = None
+    funcao: Optional[str] = None
+    departamento: Optional[str] = None
+    data_admissao: Optional[date] = None
+    tipo_pagamento: Optional[str] = None
+    horas_mensais: Optional[int] = Field(None, gt=0, le=300)
+    tipo_contrato: Optional[str] = None
+    adicional_periculosidade: Optional[float] = Field(0, ge=0, le=100)
+    adicional_insalubridade: Optional[float] = Field(0, ge=0, le=100)
+    grau_instrucao: Optional[str] = None
+    fgts_data_opcao: Optional[date] = None
+    fgts_banco: Optional[str] = None
+    beneficiarios: Optional[List[BeneficiarioBase]] = None
     data_demissao: Optional[date] = None
     tipo_desligamento: Optional[str] = None
     observacoes: Optional[str] = None

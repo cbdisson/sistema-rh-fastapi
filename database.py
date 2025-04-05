@@ -27,6 +27,7 @@ def get_db():
     except Exception as e:
         print(f"Erro na sessão do banco de dados: {e}")
         db.rollback()
+        raise
     finally:
         db.close()
 

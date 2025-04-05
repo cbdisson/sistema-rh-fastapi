@@ -14,12 +14,15 @@
             <label for="departamentoFilter">Filtrar por Departamento:</label>
             <select id="departamentoFilter">
                 <option value="">Todos</option>
-                <option value="TI">TI</option>
-                <option value="RH">RH</option>
-                <option value="Financeiro">Financeiro</option>
-                <option value="Vendas">Vendas</option>
             </select>
-            <button onclick="filtrarFuncionarios()">Filtrar</button>
+
+            <label for="ativoFilter" style="margin-left: 20px;">Status:</label>
+            <select id="ativoFilter">
+                <option value="true">Ativos</option>
+                <option value="false">Inativos</option>
+            </select>
+
+            <button onclick="filtrarFuncionarios()" id="filterButton">Filtrar</button>
         </div>
 
         <table id="funcionariosTable">
